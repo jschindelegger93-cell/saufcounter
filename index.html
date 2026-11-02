@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sauf Counter</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Titan+One&family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#1a0606;--wine:#5a0d0d;--wine2:#7d1414;--gold:#ffcc4d;--gold2:#c8891a;--cream:#fff4dc;--red:#d4141c;--text:#fff6e6;--mute:#d9b98a;--line:#6e2a12}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(900px 500px at 50% -100px,#6d1a0c,var(--bg));background-color:var(--bg);color:var(--text);font-family:"Bricolage Grotesque",system-ui,sans-serif;min-height:100vh;padding:18px 16px 40px;overflow-x:hidden}
+.wrap{max-width:540px;margin:0 auto}
+
+/* Glühbirnen-Rahmen */
+.cabinet{position:relative;border-radius:26px;padding:14px;margin-bottom:18px;
+  background:linear-gradient(180deg,#f5c55a,#a8650f 45%,#f0b84a 55%,#8a4f0a);
+  box-shadow:0 0 0 2px #3a1500 inset,0 18px 50px rgba(0,0,0,.6),0 0 40px rgba(255,170,40,.25)}
+.bulbs{position:absolute;inset:4px;border-radius:22px;pointer-events:none;
+  background:
+   radial-gradient(circle,#fff8d0 0 2.5px,#ffb52e 3.5px,transparent 5px) 0 0/22px 22px repeat-x,
+   radial-gradient(circle,#fff8d0 0 2.5px,#ffb52e 3.5px,transparent 5px) 0 100%/22px 22px repeat-x,
+   radial-gradient(circle,#fff8d0 0 2.5px,#ffb52e 3.5px,transparent 5px) 0 0/22px 22px repeat-y,
+   radial-gradient(circle,#fff8d0 0 2.5px,#ffb52e 3.5px,transparent 5px) 100% 0/22px 22px repeat-y;
+  animation:chase 1s steps(2) infinite;filter:drop-shadow(0 0 4px #ffcf5a)}
+@keyframes chase{50%{background-position:11px 0,11px 100%,0 11px,100% 11px;opacity:.75}}
+.inner{position:relative;background:linear-gradient(180deg,var(--wine2),var(--wine));border-radius:16px;padding:16px;border:2px solid #3a0a05;box-shadow:inset 0 4px 20px rgba(0,0,0,.5)}
+
+h1{font-family:"Titan One",sans-serif;font-weight:400;font-size:38px;text-align:center;line-height:1;
+  color:var(--gold);text-shadow:0 3px 0 #8a3a00,0 0 18px rgba(255,190,60,.7);letter-spacing:.02em}
+.sub{color:var(--mute);text-align:center;margin:8px 0 18px}
+
+input{width:100%;font:inherit;font-size:18px;padding:14px 16px;border-radius:12px;border:2px solid var(--gold2);background:#2a0707;color:var(--text);outline:none}
+input:focus{border-color:var(--gold)}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px;font-weight:700}
+.primary{width:100%;margin-top:10px;padding:14px;font-family:"Titan One";font-weight:400;font-size:20px;color:#5a1d00;background:linear-gradient(180deg,#ffe48a,#f2a516);box-shadow:0 4px 0 #8a4a00}
+.primary:active{transform:translateY(3px);box-shadow:0 1px 0 #8a4a00}
+.err{color:#ffb0a0;margin-top:8px;font-size:14px}
+
+/* Walzen */
+.reels{display:inline-flex;gap:4px;padding:4px;border-radius:10px;background:linear-gradient(180deg,#3a1505,#1a0802);box-shadow:inset 0 2px 6px #000}
+.reel{position:relative;width:34px;height:46px;overflow:hidden;border-radius:6px;
+  background:linear-gradient(180deg,#b9a07a 0%,var(--cream) 28%,#fffaf0 50%,var(--cream) 72%,#b9a07a 100%);
+  font-family:"Titan One";font-size:34px;line-height:46px;text-align:center;color:var(--red);
+  -webkit-text-stroke:1.5px #5a0000;text-shadow:0 2px 0 #7a0000}
+.reel .strip{position:absolute;left:0;right:0;top:0;display:none;filter:blur(1.2px)}
+.reel .strip span{display:block;height:46px}
+.reel.spin .strip{display:block;animation:roll .12s linear infinite}
+.reel.spin .val{visibility:hidden}
+.reel.land .val{animation:land .45s cubic-bezier(.3,1.6,.5,1)}
+@keyframes roll{to{transform:translateY(-460px)}}
+@keyframes land{0%{transform:translateY(-60%)}100%{transform:none}}
+.big .reel{width:52px;height:70px;font-size:54px;line-height:70px;-webkit-text-stroke:2px #5a0000}
+.big .reel .strip span{height:70px}
+.big .reel.spin .strip{animation-name:rollBig}
+@keyframes rollBig{to{transform:translateY(-700px)}}
+
+/* Eigenes Panel */
+.me{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px}
+.me small{color:var(--mute);display:block}
+.me b{font-size:21px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.drink{background:linear-gradient(180deg,#3d0b0b,#2a0606);color:var(--text);border:1.5px solid var(--gold2);padding:12px 4px;font-size:15px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:3px;transition:transform .08s}
+.drink i{font-style:normal;font-size:28px}
+.drink:active{transform:scale(.93);background:#5a1010}
+.drink.special{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;padding:16px 10px;font-family:"Titan One";font-weight:400;font-size:24px;color:#5a1d00;border:2px solid #fff1b0;
+  background:linear-gradient(180deg,#fff0a8,#ffcc4d 40%,#e09a14 60%,#ffd76a);box-shadow:0 4px 0 #8a4a00,0 0 22px rgba(255,200,60,.55);text-shadow:0 1px 0 #ffe9a0;animation:shine 2.4s infinite}
+.drink.special i{font-size:36px}
+.drink.special small{display:block;font-family:"Bricolage Grotesque";font-weight:700;font-size:13px;color:#7a3a00}
+.drink.special:active{transform:translateY(3px);box-shadow:0 1px 0 #8a4a00}
+@keyframes shine{50%{box-shadow:0 4px 0 #8a4a00,0 0 34px rgba(255,210,80,.9)}}
+.row{display:flex;gap:8px;margin-top:10px}
+.ghost{flex:1;background:transparent;border:1px solid var(--line);color:var(--mute);padding:10px;font-weight:500;font-size:14px}
+
+/* Ranking */
+h2{font-family:"Titan One";font-weight:400;font-size:24px;color:var(--gold);text-shadow:0 2px 0 #7a3000;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.live{width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 10px #ff3b30;animation:p 1.2s infinite}
+@keyframes p{50%{opacity:.25}}
+.list{position:relative}
+.item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;margin-bottom:8px;background:rgba(0,0,0,.22);border:1px solid rgba(255,200,80,.15);transition:transform .5s cubic-bezier(.3,1.3,.5,1),background .3s}
+.item .rank{width:34px;text-align:center;font-family:"Titan One";font-size:20px;color:var(--mute)}
+.item .name{flex:1;font-size:18px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item.you{border-color:var(--gold);background:rgba(255,190,60,.12)}
+.item.you .name{color:var(--gold)}
+.item.flash{animation:flash 1.4s}
+@keyframes flash{0%,40%{background:rgba(255,200,60,.45);box-shadow:0 0 24px rgba(255,200,60,.8)}}
+.empty{color:var(--mute);text-align:center;padding:14px}
+
+/* JACKPOT-Overlay */
+.jackpot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;z-index:20}
+.jackpot.on{animation:jp 3.5s ease forwards}
+@keyframes jp{0%{opacity:0;transform:scale(.4)}15%{opacity:1;transform:scale(1.08)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:scale(1.05)}}
+.jackpot .word{font-family:"Titan One";font-size:clamp(44px,13vw,84px);text-align:center;line-height:1.05;color:var(--gold);
+  -webkit-text-stroke:3px #7a2a00;text-shadow:0 6px 0 #7a2a00,0 0 30px #ffb000,0 0 60px #ff7a00}
+.jackpot .who{margin-top:6px;font-family:"Titan One";font-size:22px;color:#fff;background:var(--red);padding:6px 18px;border-radius:999px;border:2px solid var(--gold);box-shadow:0 0 20px rgba(255,60,0,.6)}
+.coin{position:fixed;top:-30px;font-size:26px;pointer-events:none;z-index:19;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+
+@media (prefers-reduced-motion:reduce){.bulbs,.reel.spin .strip,.jackpot.on,.coin{animation:none!important}}
+
+/* Cooldown */
+.cool{margin-top:10px;padding:12px 14px;border-radius:12px;text-align:center;background:linear-gradient(180deg,#2a0606,#1a0303);border:2px solid #ff5a3c;color:#ffd9cc;font-weight:700}
+.cool b{display:block;font-family:"Titan One";font-weight:400;font-size:22px;color:#ff8a5c;margin-bottom:2px}
+.cool .bar{height:6px;border-radius:3px;background:#3a0a0a;margin-top:8px;overflow:hidden}
+.cool .bar i{display:block;height:100%;background:linear-gradient(90deg,#ff5a3c,#ffcc4d);transition:width 1s linear}
+.cool.nudge{animation:nudge .4s}
+@keyframes nudge{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.grid.locked .drink{opacity:.4;filter:grayscale(.6)}
+/* TORNADO */
+.tornado{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:30;overflow:hidden}
+.tw{position:absolute;top:22vh;left:0;animation:tmove 3.4s cubic-bezier(.45,.05,.55,.95) forwards}
+.tw .wob{animation:twob .5s ease-in-out infinite alternate}
+.tw .funnel{font-size:min(70vw,320px);line-height:1;display:block;filter:drop-shadow(0 0 30px rgba(180,200,255,.6));animation:tspin .35s linear infinite}
+.tw .deb{position:absolute;left:50%;top:50%;font-size:34px;animation:orbit linear infinite}
+@keyframes tmove{0%{transform:translateX(-80vw)}100%{transform:translateX(130vw)}}
+@keyframes twob{from{transform:translateY(-4vh) rotate(-6deg)}to{transform:translateY(5vh) rotate(6deg)}}
+@keyframes tspin{0%{transform:scaleX(1)}50%{transform:scaleX(-1)}100%{transform:scaleX(1)}}
+@keyframes orbit{from{transform:rotate(0deg) translateX(var(--r)) rotate(0deg)}to{transform:rotate(360deg) translateX(var(--r)) rotate(-720deg)}}
+.tbanner{position:absolute;left:50%;top:12vh;transform:translateX(-50%);text-align:center;white-space:nowrap;animation:tban 3.4s ease forwards}
+.tbanner .w{font-family:"Titan One";font-size:clamp(46px,14vw,90px);color:#dff3ff;-webkit-text-stroke:3px #1b3a6b;text-shadow:0 6px 0 #1b3a6b,0 0 30px #7fc4ff}
+.tbanner .n{display:inline-block;margin-top:6px;font-family:"Titan One";font-size:22px;color:#5a1d00;background:linear-gradient(180deg,#fff0a8,#ffcc4d 45%,#e09a14);padding:6px 18px;border-radius:999px;border:2px solid #fff1b0;box-shadow:0 0 22px rgba(255,200,60,.7)}
+@keyframes tban{0%{opacity:0;transform:translateX(-50%) scale(.3) rotate(-20deg)}15%{opacity:1;transform:translateX(-50%) scale(1.1) rotate(4deg)}25%{transform:translateX(-50%) scale(1) rotate(0)}85%{opacity:1}100%{opacity:0}}
+.tdark{position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(120,150,200,.25),rgba(10,15,30,.55));animation:tdark 3.4s ease forwards}
+@keyframes tdark{0%,100%{opacity:0}15%,80%{opacity:1}}
+body.shake .wrap{animation:shake .12s linear 22}
+@keyframes shake{25%{transform:translate(-5px,3px) rotate(-.6deg)}75%{transform:translate(5px,-3px) rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){.tw,.tw *,body.shake .wrap{animation-duration:0s!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎰 SAUF<br>COUNTER</h1>
+  <p class="sub">Heutiges Motto: Sich einen zwischen die Kiemen peitschen. 🍻🐠</p>
+
+  <div class="cabinet" id="login"><div class="bulbs"></div><div class="inner">
+    <input id="name" placeholder="Dein Name" maxlength="24" autocomplete="off">
+    <button class="primary" id="join">MITSPIELEN</button>
+    <div class="err" id="err"></div>
+  </div></div>
+
+  <div class="cabinet" id="panel" hidden><div class="bulbs"></div><div class="inner">
+    <div class="me">
+      <div><small>Eingeloggt als</small><b id="meName"></b></div>
+      <div class="reels big" id="meReels"></div>
+    </div>
+    <div class="grid" id="drinks"></div>
+    <div class="cool" id="cool" hidden><b>Sauf jetzt! 🐷</b>In 1 min kannst wieder was eintragen<br><span id="coolSec"></span><div class="bar"><i id="coolBar"></i></div></div>
+    <div class="row">
+      <button class="ghost" id="undo">↩︎ Letztes rückgängig</button>
+      <button class="ghost" id="logout">Abmelden</button>
+    </div>
+  </div></div>
+
+  <div class="cabinet"><div class="bulbs"></div><div class="inner">
+    <h2><span class="live"></span>LIVE-RANKING</h2>
+    <div class="list" id="board"><div class="empty">Lädt…</div></div>
+  </div></div>
+</div>
+<div class="jackpot" id="jackpot"><div class="word">Dri wi a<br>Schwi! 🐷</div><div class="who" id="who"></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, where, serverTimestamp, Timestamp, increment, writeBatch } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const firebaseConfig = {apiKey:"AIzaSyDmOeAZVIyrvNiitYNjp5UHzSFbZQ1JaYI",authDomain:"sauf-counter.firebaseapp.com",projectId:"sauf-counter",storageBucket:"sauf-counter.firebasestorage.app",messagingSenderId:"122224999517",appId:"1:122224999517:web:a259c7a73a5493b7fc21b4"};
+const db = getFirestore(initializeApp(firebaseConfig));
+const ADMIN_KEY = new URLSearchParams(location.search).get("admin");
+const EPOCH = new Timestamp(0, 0);
+const COOL = 60000;
+
+const DRINKS=[["🍺","Bier"],["🍷","Wein"],["🥂","Spritzer"],["🥃","Shot"],["🍹","Cocktail"],["🥤","Sonstiges"]];
+const MEDAL=["🥇","🥈","🥉"];
+const $=id=>document.getElementById(id);
+let round=null,me=null,board=[],prev=null;const rows=new Map(),players=new Map();
+function loadMe(){try{const m=JSON.parse(localStorage.getItem("sauf-me"));return m&&m.round===round?m:null}catch(e){return null}}
+function saveMe(m){try{m?localStorage.setItem("sauf-me",JSON.stringify(m)):localStorage.removeItem("sauf-me")}catch(e){}}
+
+/* ---- Walzen ---- */
+function makeReel(){
+  const r=document.createElement("div");r.className="reel";
+  const s=document.createElement("div");s.className="strip";
+  for(let i=0;i<=10;i++){const sp=document.createElement("span");sp.textContent=i%10;s.appendChild(sp)}
+  const v=document.createElement("div");v.className="val";
+  r.append(s,v);return r;
+}
+function setReels(box,num,animate){
+  const digits=String(Math.max(0,num)).padStart(2,"0").split("");
+  while(box.children.length<digits.length)box.prepend(makeReel());
+  while(box.children.length>digits.length)box.firstChild.remove();
+  [...box.children].forEach((r,i)=>{
+    const v=r.querySelector(".val"),d=digits[i];
+    if(!animate){v.textContent=d;return}
+    clearTimeout(r._t);r.classList.remove("land");r.classList.add("spin");
+    r.querySelector(".strip").style.animationDelay=(-Math.random()*.12)+"s";
+    r._t=setTimeout(()=>{v.textContent=d;r.classList.remove("spin");void r.offsetWidth;r.classList.add("land")},700+i*350);
+  });
+}
+
+/* ---- Jackpot ---- */
+function jackpot(text){
+  const j=$("jackpot");$("who").textContent=text;
+  j.classList.remove("on");void j.offsetWidth;j.classList.add("on");
+  for(let i=0;i<18;i++){
+    const c=document.createElement("div");c.className="coin";
+    c.textContent=["🐷","🍺","🪙","🐽"][i%4];
+    c.style.left=Math.random()*100+"vw";c.style.animationDuration=(2.4+Math.random()*1.6)+"s";
+    c.style.animationDelay=Math.random()*.4+"s";
+    document.body.appendChild(c);setTimeout(()=>c.remove(),5000);
+  }
+}
+
+/* ---- Tornado ---- */
+function tornado(name){
+  const t=document.createElement("div");t.className="tornado";
+  const deb=["🍺","🍺","🐷","🪙","🍺","🌪️","🍻","🐽"].map((e,i)=>`<span class="deb" style="--r:${60+i*14}px;animation-duration:${.6+i*.12}s">${e}</span>`).join("");
+  t.innerHTML=`<div class="tdark"></div><div class="tw"><div class="wob"><span class="funnel">🌪️</span>${deb}</div></div>
+    <div class="tbanner"><div class="w">TORNADO!</div><div class="n"></div></div>`;
+  t.querySelector(".n").textContent=`🌪️🍺 ${name} +2`;
+  document.body.appendChild(t);document.body.classList.add("shake");
+  if(navigator.vibrate)try{navigator.vibrate([200,80,200,80,400])}catch(e){}
+  setTimeout(()=>{t.remove();document.body.classList.remove("shake")},3500);
+}
+
+/* ---- Render ---- */
+function render(skip){
+  $("login").hidden=!!me;$("panel").hidden=!me;
+  const prevMap=prev?new Map(prev.map(b=>[b.id,b.count])):null;
+  const ups=[];
+  if(me){
+    $("meName").textContent=me.name;
+    const r=board.find(b=>b.id===me.id),c=r?r.count:0;
+    const old=$("meReels").dataset.v;
+    setReels($("meReels"),c,old!==undefined&&+old!==c);
+    $("meReels").dataset.v=c;
+  }
+  const list=$("board");
+  if(!board.length){list.innerHTML='<div class="empty">Noch niemand dabei – sei der Erste!</div>';rows.clear();prev=board;return}
+  list.querySelector(".empty")?.remove();
+  // FLIP: alte Positionen merken
+  const before=new Map([...rows].map(([id,el])=>[id,el.getBoundingClientRect().top]));
+  const seen=new Set();
+  board.forEach((b,i)=>{
+    let el=rows.get(b.id);
+    if(!el){
+      el=document.createElement("div");el.className="item";
+      el.innerHTML='<div class="rank"></div><div class="name"></div><div class="reels"></div>';
+      rows.set(b.id,el);
+    }
+    el.querySelector(".rank").textContent=MEDAL[i]||i+1;
+    el.querySelector(".name").textContent=b.name;
+    el.classList.toggle("you",!!me&&b.id===me.id);
+    const old=prevMap?prevMap.get(b.id):undefined;
+    const changed=old!==undefined&&old!==b.count;
+    setReels(el.querySelector(".reels"),b.count,changed);
+    if(changed){el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");if(b.count>old&&b.id!==skip)ups.push(b)}
+    list.appendChild(el);seen.add(b.id);
+  });
+  for(const [id,el] of rows)if(!seen.has(id)){el.remove();rows.delete(id)}
+  // FLIP: Umreihung animieren
+  for(const [id,el] of rows){
+    const t=before.get(id);if(t===undefined)continue;
+    const dy=t-el.getBoundingClientRect().top;
+    if(dy){el.style.transition="none";el.style.transform=`translateY(${dy}px)`;requestAnimationFrame(()=>{el.style.transition="";el.style.transform=""})}
+  }
+  if(ups.length)jackpot(ups.map(b=>`${b.name} → ${b.count}`).join(" · "));
+  prev=board.map(b=>({...b}));
+}
+
+/* ---- Daten live (Firestore) ---- */
+let unsubPlayers=null,first=true;
+function listenPlayers(){
+  if(unsubPlayers)unsubPlayers();
+  first=true;prev=null;rows.clear();players.clear();board=[];$("board").innerHTML='<div class="empty">Lädt…</div>';
+  unsubPlayers=onSnapshot(query(collection(db,"players"),where("round","==",round)),snap=>{
+    let tUser=null;
+    if(!first)snap.docChanges().forEach(ch=>{
+      if(ch.type!=="modified")return;
+      const d=ch.doc.data({serverTimestamps:"estimate"}),o=players.get(ch.doc.id);
+      if(d.lastPts===2&&o&&d.count>o.count)tUser=ch.doc.id;
+    });
+    players.clear();
+    snap.forEach(d=>players.set(d.id,d.data({serverTimestamps:"estimate"})));
+    board=[...players].map(([id,x])=>({id,name:x.name,count:x.count||0}))
+      .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name));
+    first=false;
+    if(me&&!players.has(me.id)&&!snap.metadata.fromCache){me=null;saveMe(null)}
+    render(tUser);tickCd();
+    if(tUser)tornado(players.get(tUser).name);
+  },err=>{console.error(err);$("board").innerHTML='<div class="empty">Verbindungsfehler – Seite neu laden</div>'});
+}
+onSnapshot(doc(db,"config","game"),async s=>{
+  if(!s.exists()){try{await setDoc(doc(db,"config","game"),{round:1})}catch(e){}return}
+  const r=s.data().round;
+  if(r!==round){round=r;me=loadMe();delete $("meReels").dataset.v;listenPlayers();render()}
+});
+
+$("drinks").innerHTML=DRINKS.map(([e,n])=>`<button class="drink" data-t="${n}"><i>${e}</i>${n}</button>`).join("")
+  +`<button class="drink special" data-t="Tornadobier"><i>🌪️🍺</i><span>TORNADOBIER<small>Spezialgetränk · zählt 2 Punkte</small></span></button>`;
+
+/* ---- 60 s Pause ---- */
+let denyUntil=0;
+function cdLeft(){
+  const p=me&&players.get(me.id);
+  const srv=p&&p.lastAt?p.lastAt.toMillis()+COOL-Date.now():0;
+  return Math.max(0,srv,denyUntil-Date.now());
+}
+function tickCd(nudge){
+  const left=cdLeft(),box=$("cool");
+  $("drinks").classList.toggle("locked",left>0);
+  if(!left||!me){box.hidden=true;return}
+  box.hidden=false;
+  const sec=Math.ceil(left/1000);
+  $("coolSec").textContent=`noch ${sec} Sekunde${sec===1?"":"n"}`;
+  $("coolBar").style.width=Math.min(100,100-left/COOL*100)+"%";
+  if(nudge){box.classList.remove("nudge");void box.offsetWidth;box.classList.add("nudge")}
+}
+setInterval(tickCd,1000);
+
+let busy=false;
+$("drinks").onclick=async e=>{
+  const b=e.target.closest(".drink");if(!b||!me||busy)return;
+  if(cdLeft()>0){tickCd(true);if(navigator.vibrate)try{navigator.vibrate(120)}catch(_){}return}
+  const pts=b.dataset.t==="Tornadobier"?2:1;
+  busy=true;
+  try{await updateDoc(doc(db,"players",me.id),{count:increment(pts),lastPts:pts,lastAt:serverTimestamp()})}
+  catch(err){if(err.code==="permission-denied"){if(!cdLeft())denyUntil=Date.now()+5000;tickCd(true)}else alert("Fehler: "+err.message)}
+  busy=false;
+};
+$("undo").onclick=async()=>{
+  const p=me&&players.get(me.id);if(!p||!p.lastPts)return;
+  try{await updateDoc(doc(db,"players",me.id),{count:increment(-p.lastPts),lastPts:0,lastAt:EPOCH});denyUntil=0}catch(e){}
+};
+$("logout").onclick=()=>{me=null;saveMe(null);$("cool").hidden=true;delete $("meReels").dataset.v;render()};
+$("join").onclick=async()=>{
+  const n=$("name").value.trim().replace(/\s+/g," ").slice(0,24);
+  if(!n){$("err").textContent="Bitte Namen eingeben";return}
+  if(round===null){$("err").textContent="Verbindet noch… kurz warten";return}
+  $("join").disabled=true;
+  try{
+    const id=round+"_"+encodeURIComponent(n.toLowerCase());
+    const ref=doc(db,"players",id);
+    let s=await getDoc(ref);
+    if(!s.exists()){try{await setDoc(ref,{name:n,round,count:0,lastPts:0,lastAt:EPOCH})}catch(e){}s=await getDoc(ref)}
+    if(!s.exists())throw new Error("Anmelden hat nicht geklappt");
+    me={id,name:s.data().name,round};saveMe(me);$("err").textContent="";render();tickCd();
+  }catch(e){$("err").textContent=e.message}
+  $("join").disabled=false;
+};
+$("name").onkeydown=e=>{if(e.key==="Enter")$("join").click()};
+
+/* ---- Admin: neue Runde (alle auf 0) ---- */
+if(ADMIN_KEY){
+  const btn=document.createElement("button");btn.className="ghost";btn.style.cssText="width:100%;margin-top:6px";
+  btn.textContent="🔄 Neue Runde starten (alle auf 0)";
+  $("board").after(btn);
+  btn.onclick=async()=>{
+    if(round===null||!confirm("Wirklich alle auf 0 setzen?"))return;
+    try{
+      const b=writeBatch(db);
+      b.set(doc(db,"adminkeys",ADMIN_KEY,"rounds",String(round+1)),{at:serverTimestamp()});
+      b.update(doc(db,"config","game"),{round:round+1});
+      await b.commit();alert("Neue Runde gestartet ✅");
+    }catch(e){alert("Nicht erlaubt (falscher Admin-Link?)")}
+  };
+}
+
+render();
+</script>
+</body>
+</html>
