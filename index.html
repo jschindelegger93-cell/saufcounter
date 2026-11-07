@@ -167,6 +167,7 @@ const db = getFirestore(initializeApp(firebaseConfig));
 const ADMIN_KEY = new URLSearchParams(location.search).get("admin");
 const EPOCH = new Timestamp(0, 0);
 const COOL = 60000;
+const HIDDEN=new Set(["4_flipsn","4_staplerfahrer","4_dralex","4_alexander%20van%20der%20bellen"]);
 
 const DRINKS=[["🍺","Bier"],["🍷","Wein"],["🥂","Spritzer"],["🥃","Shot"],["🍹","Cocktail"],["🥤","Sonstiges"]];
 const MEDAL=["🥇","🥈","🥉"];
@@ -280,10 +281,10 @@ function listenPlayers(){
     });
     players.clear();
     snap.forEach(d=>players.set(d.id,d.data({serverTimestamps:"estimate"})));
-    board=[...players].map(([id,x])=>({id,name:x.name,count:x.count||0}))
+    board=[...players].filter(([id])=>!HIDDEN.has(id)).map(([id,x])=>({id,name:x.name,count:x.count||0}))
       .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name));
     first=false;
-    if(me&&!players.has(me.id)&&!snap.metadata.fromCache){me=null;saveMe(null)}
+    if(me&&((!players.has(me.id)&&!snap.metadata.fromCache)||HIDDEN.has(me.id))){me=null;saveMe(null)}
     render(tUser);tickCd();
     if(tUser)tornado(players.get(tUser).name);
   },err=>{console.error(err);$("board").innerHTML='<div class="empty">Verbindungsfehler – Seite neu laden</div>'});
@@ -338,6 +339,7 @@ $("join").onclick=async()=>{
   $("join").disabled=true;
   try{
     const id=round+"_"+encodeURIComponent(n.toLowerCase());
+    if(HIDDEN.has(id))throw new Error("Dieser Name ist gesperrt – nimm einen anderen");
     const ref=doc(db,"players",id);
     let s=await getDoc(ref);
     if(!s.exists()){try{await setDoc(ref,{name:n,round,count:0,lastPts:0,lastAt:EPOCH})}catch(e){}s=await getDoc(ref)}
