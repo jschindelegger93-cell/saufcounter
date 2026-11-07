@@ -106,17 +106,6 @@ h2{font-family:"Titan One";font-weight:400;font-size:24px;color:var(--gold);text
 .cool.nudge{animation:nudge .4s}
 @keyframes nudge{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
 .grid.locked .drink{opacity:.4;filter:grayscale(.6)}
-/* SEBI POPUP */
-.sebi{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,2,2,.72);opacity:0;pointer-events:none;transition:opacity .25s}
-.sebi.on{opacity:1;pointer-events:auto}
-.sebi .box{position:relative;width:100%;max-width:380px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;border-radius:22px;padding:12px;
-  background:linear-gradient(180deg,#f5c55a,#a8650f 45%,#f0b84a 55%,#8a4f0a);box-shadow:0 20px 60px rgba(0,0,0,.7),0 0 40px rgba(255,170,40,.35);transform:scale(.85);transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
-.sebi.on .box{transform:scale(1)}
-.sebi .in{background:linear-gradient(180deg,var(--wine2),var(--wine));border-radius:14px;padding:14px;display:flex;flex-direction:column;min-height:0}
-.sebi h3{font-family:"Titan One";font-weight:400;font-size:clamp(22px,6.5vw,28px);line-height:1.1;text-align:center;color:var(--gold);text-shadow:0 2px 0 #7a3000,0 0 14px rgba(255,190,60,.6);margin:2px 34px 12px}
-.sebi img{display:block;width:100%;min-height:0;flex:1;object-fit:contain;border-radius:10px;border:2px solid var(--gold2);background:#000}
-.sebi .ok{margin-top:12px;width:100%;padding:12px;font-family:"Titan One";font-weight:400;font-size:18px;color:#5a1d00;background:linear-gradient(180deg,#ffe48a,#f2a516);box-shadow:0 4px 0 #8a4a00}
-.sebi .x{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;font-size:20px;line-height:1;color:#fff;background:rgba(0,0,0,.55);border:2px solid var(--gold)}
 /* TORNADO */
 .tornado{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:30;overflow:hidden}
 .tw{position:absolute;top:22vh;left:0;animation:tmove 3.4s cubic-bezier(.45,.05,.55,.95) forwards}
@@ -167,10 +156,6 @@ body.shake .wrap{animation:shake .12s linear 22}
     <div class="list" id="board"><div class="empty">Lädt…</div></div>
   </div></div>
 </div>
-<div class="sebi" id="sebi" aria-hidden="true"><div class="box" role="dialog" aria-label="Sebi Summer Spezial Spalierprogramm">
-  <button class="x" id="sebiX" aria-label="Schließen">✕</button>
-  <div class="in"><h3>Sebi Summer Spezial Spalierprogramm</h3><img src="sebi.jpg" alt="Sebi Summer Spezial"><button class="ok" id="sebiOk">Weiter saufen 🍺</button></div>
-</div></div>
 <div class="jackpot" id="jackpot"><div class="word">Dri wi a<br>Schwi! 🐷</div><div class="who" id="who"></div></div>
 
 <script type="module">
@@ -212,17 +197,6 @@ function setReels(box,num,animate){
 }
 
 /* ---- Jackpot ---- */
-/* ---- Sebi Popup ---- */
-let sebiT=null;
-function sebiOpen(delay){
-  clearTimeout(sebiT);
-  sebiT=setTimeout(()=>{const e=$("sebi");e.classList.add("on");e.setAttribute("aria-hidden","false")},delay||0);
-}
-function sebiClose(){clearTimeout(sebiT);const e=$("sebi");e.classList.remove("on");e.setAttribute("aria-hidden","true")}
-$("sebiX").onclick=sebiClose;$("sebiOk").onclick=sebiClose;
-$("sebi").onclick=e=>{if(e.target.id==="sebi")sebiClose()};
-document.addEventListener("keydown",e=>{if(e.key==="Escape")sebiClose()});
-
 function jackpot(text){
   const j=$("jackpot");$("who").textContent=text;
   j.classList.remove("on");void j.offsetWidth;j.classList.add("on");
@@ -288,7 +262,7 @@ function render(skip){
     const dy=t-el.getBoundingClientRect().top;
     if(dy){el.style.transition="none";el.style.transform=`translateY(${dy}px)`;requestAnimationFrame(()=>{el.style.transition="";el.style.transform=""})}
   }
-  if(ups.length){jackpot(ups.map(b=>`${b.name} → ${b.count}`).join(" · "));sebiOpen(3600)}
+  if(ups.length)jackpot(ups.map(b=>`${b.name} → ${b.count}`).join(" · "));
   prev=board.map(b=>({...b}));
 }
 
@@ -311,7 +285,7 @@ function listenPlayers(){
     first=false;
     if(me&&!players.has(me.id)&&!snap.metadata.fromCache){me=null;saveMe(null)}
     render(tUser);tickCd();
-    if(tUser){tornado(players.get(tUser).name);sebiOpen(3600)}
+    if(tUser)tornado(players.get(tUser).name);
   },err=>{console.error(err);$("board").innerHTML='<div class="empty">Verbindungsfehler – Seite neu laden</div>'});
 }
 onSnapshot(doc(db,"config","game"),async s=>{
