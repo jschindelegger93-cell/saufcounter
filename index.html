@@ -166,7 +166,7 @@ const firebaseConfig = {apiKey:"AIzaSyDmOeAZVIyrvNiitYNjp5UHzSFbZQ1JaYI",authDom
 const db = getFirestore(initializeApp(firebaseConfig));
 const ADMIN_KEY = new URLSearchParams(location.search).get("admin");
 const EPOCH = new Timestamp(0, 0);
-const COOL = 0; // Countdown aus
+const COOL = 60000;
 
 const DRINKS=[["🍺","Bier"],["🍷","Wein"],["🥂","Spritzer"],["🥃","Shot"],["🍹","Cocktail"],["🥤","Sonstiges"]];
 const MEDAL=["🥇","🥈","🥉"];
@@ -311,7 +311,7 @@ function tickCd(nudge){
   box.hidden=false;
   const sec=Math.ceil(left/1000);
   $("coolSec").textContent=`noch ${sec} Sekunde${sec===1?"":"n"}`;
-  $("coolBar").style.width=Math.min(100,100-left/60000*100)+"%";
+  $("coolBar").style.width=Math.min(100,100-left/COOL*100)+"%";
   if(nudge){box.classList.remove("nudge");void box.offsetWidth;box.classList.add("nudge")}
 }
 setInterval(tickCd,1000);
